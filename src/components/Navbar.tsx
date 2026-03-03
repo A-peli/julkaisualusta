@@ -11,10 +11,12 @@ export default function Navbar() {
   const router = useRouter();
 
   useEffect(() => {
+    let cancelled = false;
     fetch('/api/auth/me')
       .then((r) => (r.ok ? r.json() : null))
-      .then((data) => data && setUser(data.user))
+      .then((data) => { if (!cancelled && data) setUser(data.user); })
       .catch(() => null);
+    return () => { cancelled = true; };
   }, []);
 
   const logout = async () => {
@@ -25,7 +27,7 @@ export default function Navbar() {
     router.refresh();
   };
 
-  const NavLinks = () => (
+  const navLinks = (
     <>
       <Link href="/" className="hover:text-blue-600 transition-colors" onClick={() => setMenuOpen(false)}>
         Etusivu
@@ -62,7 +64,7 @@ export default function Navbar() {
 
         {/* Desktop links */}
         <div className="hidden md:flex items-center gap-6 text-sm font-medium text-gray-700">
-          <NavLinks />
+          {navLinks}
         </div>
 
         {/* Mobile hamburger */}
@@ -80,7 +82,7 @@ export default function Navbar() {
       {/* Mobile dropdown */}
       {menuOpen && (
         <div className="md:hidden border-t border-gray-200 bg-white px-4 py-3 flex flex-col gap-4 text-sm font-medium text-gray-700">
-          <NavLinks />
+          {navLinks}
         </div>
       )}
     </nav>

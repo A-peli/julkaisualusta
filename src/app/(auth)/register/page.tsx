@@ -32,7 +32,8 @@ export default function RegisterPage() {
         body: JSON.stringify({ email, password }),
       });
       if (!loginRes.ok) {
-        router.push('/login');
+        // Registration succeeded but auto-login failed; go to login page
+        router.push('/login?registered=1');
         return;
       }
       router.push('/');

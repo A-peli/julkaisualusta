@@ -11,14 +11,20 @@ export default function HomePage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    let cancelled = false;
     Promise.all([
-      fetch('/api/posts').then((r) => r.json()),
+      fetch('/api/posts').then((r) => r.ok ? r.json() : Promise.reject(r.status)),
       fetch('/api/auth/me').then((r) => (r.ok ? r.json() : null)),
     ]).then(([postsData, userData]) => {
+      if (cancelled) return;
       setPosts(postsData.posts || []);
       if (userData) setUser(userData.user);
-      setLoading(false);
+    }).catch(() => {
+      if (!cancelled) setPosts([]);
+    }).finally(() => {
+      if (!cancelled) setLoading(false);
     });
+    return () => { cancelled = true; };
   }, []);
 
   const handleDelete = async (id: string) => {

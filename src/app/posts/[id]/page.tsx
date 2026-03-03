@@ -15,15 +15,20 @@ export default function PostPage() {
   const router = useRouter();
 
   useEffect(() => {
+    let cancelled = false;
     Promise.all([
       fetch(`/api/posts/${id}`).then((r) => (r.ok ? r.json() : null)),
       fetch('/api/auth/me').then((r) => (r.ok ? r.json() : null)),
     ]).then(([postData, userData]) => {
+      if (cancelled) return;
       if (!postData) setNotFound(true);
       else setPost(postData.post);
       if (userData) setUser(userData.user);
       setLoading(false);
+    }).catch(() => {
+      if (!cancelled) { setNotFound(true); setLoading(false); }
     });
+    return () => { cancelled = true; };
   }, [id]);
 
   const handleDelete = async () => {
