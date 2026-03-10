@@ -8,6 +8,8 @@ declare global {
 }
 
 const mongodbUri = process.env.MONGODB_URI as string;
+// Debug-tiedot MongoDB-yhteydestä
+console.log("MONGODB_URI löydetty:", !!mongodbUri);
 
 if (!mongodbUri) {
   throw new Error("MONGODB_URI environment variable is not defined");
